@@ -6,10 +6,10 @@ import './SinglePost.css';
 const SinglePost = (props) =>
 {
   let { postId } = useParams();
-  const [ posts, setPosts ] = useState( [] );
+  const [ onePost, setOnePost ] = useState( [] );
 
   useEffect( () =>{
-    console.log( postId );
+    // console.log( postId );
     fetch( 'http://localhost:5025/feed/post/' + postId, {
       headers: {
         Authorization: 'Bearer ' + props.token
@@ -20,12 +20,14 @@ const SinglePost = (props) =>
       throw new Error('Failed to fetch status');
       }
         return res.json();
-              // setPosts(s => ({ ...s, value: res.data }));
+              // setsinglePost(s => ({ ...s, value: res.data }));
       } )
       .then( resProps => {
-        setPosts({
+        setOnePost( {
+          mes: resProps.message,
+          all: resProps.post,
           title: resProps.post.title,
-          author: resProps.post.creator.name,
+          creator: resProps.post.creator.name,
           image: resProps.post.imageUrl,
           date: new Date( resProps.post.createdAt ).toLocaleDateString( 'en-US' ),
           content: resProps.post.content
@@ -34,21 +36,21 @@ const SinglePost = (props) =>
       .catch(err => {
         console.log(err);
       } );
-  }, [] )
-  console.log(posts.date);
-  console.log(posts.author);
+    }, [ postId, props.token ] )
+    console.log("hi all", onePost.all);
   return (
     <section className="single-post">
-      <h1>{posts.title}</h1>
-      <h2>author: { posts.author } </h2>
-      <h2>created at : { posts.date }</h2>
-      <h2>post id: { postId }</h2>
-      <p>image url: { posts.image }</p>
-      {/* <img src=''/> */}
+      <h1>{onePost.title}</h1>
+      {/* <h4>current user id: {props.userId}</h4> */}
+      <h4>Posted by: {onePost.creator} ;; Created at : { onePost.date }</h4>
+      {/* <h4>post id: { postId }</h4> */}
+      <h4>Content: {onePost.content}</h4>
+      <p>image url: { onePost.image }</p>
+      <h6>message from backend: {onePost.mes}</h6>
+      {/* <img src=''/> */ }
       <div className="single-post__image">
-        <Image contain imageUrl={posts.image} />
+        <Image contain imageUrl={onePost.image} />
       </div>
-      <p>{posts.content}</p>
     </section>
   );
 }

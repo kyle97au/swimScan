@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import './NavigationItems.css';
 
 const navItems = [
-  { id: 'feed', text: 'Feed', link: '/', auth: true },
+  // { id: 'feed', text: 'hihi', link: '/', auth: true },
   { id: 'login', text: 'Login', link: '/', auth: false },
   { id: 'signup', text: 'Signup', link: '/signup', auth: false }
 ];
@@ -15,15 +15,17 @@ const navigationItems = props => [
       key={item.id}
       className={['navigation-item', props.mobile ? 'mobile' : ''].join(' ')}
     >
-      <NavLink to={item.link} exact onClick={props.onChoose}>
+      <NavLink to={item.link} onClick={props.onChoose}>
         {item.text}
       </NavLink>
     </li>
   )),
   props.isAuth && (
+    <NavLink to="/">
     <li className="navigation-item" key="logout">
       <button onClick={props.onLogout}>Logout</button>
-    </li>
+      </li>
+    </NavLink>
   )
 ];
 

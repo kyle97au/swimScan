@@ -9,6 +9,10 @@
   flex: 1;
 }
 
+.spacer2 {
+  flex: 0.1;
+}
+
 .main-nav__items {
   list-style: none;
   padding: 0;
@@ -20,4 +24,16 @@
   .main-nav__items {
     display: flex;
   }
+}
+
+.currentUser {
+  color: yellow;
+}
+
+.logo {
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid white;
+  padding: 0.5rem;
+  color: white;
 }

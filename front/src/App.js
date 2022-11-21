@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import { Route,Routes, Navigate } from 'react-router-dom';
-
 import Layout from './components/Layout/Layout';
 import Backdrop from './components/Backdrop/Backdrop';
 import Toolbar from './components/Toolbar/Toolbar';
@@ -18,13 +17,11 @@ class App extends Component {
     showBackdrop: false,
     showMobileNav: false,
     isAuth: false,
-    token: null,
-    userId: null,
     authLoading: false,
-    error: null
   };
 
-  componentDidMount() {
+  componentDidMount ()
+  {
     const token = localStorage.getItem('token');
     const expiryDate = localStorage.getItem('expiryDate');
     if (!token || !expiryDate) {
@@ -34,26 +31,28 @@ class App extends Component {
       this.logoutHandler();
       return;
     }
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem( 'userId' );
+    const userName = localStorage.getItem( 'userName' );
     const remainingMilliseconds =
-      new Date(expiryDate).getTime() - new Date().getTime();
-    this.setState({ isAuth: true, token: token, userId: userId });
+    new Date(expiryDate).getTime() - new Date().getTime();
+    this.setState({ isAuth: true, token: token, userId: userId, userName: userName});
     this.setAutoLogout(remainingMilliseconds);
   }
-
+  
   mobileNavHandler = isOpen => {
     this.setState({ showMobileNav: isOpen, showBackdrop: isOpen });
   };
-
+  
   backdropClickHandler = () => {
     this.setState({ showBackdrop: false, showMobileNav: false, error: null });
   };
-
+  
   logoutHandler = () => {
-    this.setState({ isAuth: false, token: null });
+    this.setState({ isAuth: false, token: null, userName: null });
     localStorage.removeItem('token');
     localStorage.removeItem('expiryDate');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
   };
 
   loginHandler = (event, authData) => {
@@ -80,31 +79,33 @@ class App extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
+        // console.log(resData);
         this.setState({
           isAuth: true,
           token: resData.token,
           authLoading: false,
-          userId: resData.userId
+          userId: resData.userId,
+          userName: resData.userName,
         });
         localStorage.setItem('token', resData.token);
         localStorage.setItem('userId', resData.userId);
+        localStorage.setItem( 'userName', resData.userName);
         const remainingMilliseconds = 60 * 60 * 1000;
         const expiryDate = new Date(
           new Date().getTime() + remainingMilliseconds
-        );
-        localStorage.setItem('expiryDate', expiryDate.toISOString());
-        this.setAutoLogout(remainingMilliseconds);
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          isAuth: false,
-          authLoading: false,
-          error: err
+          );
+          localStorage.setItem('expiryDate', expiryDate.toISOString());
+          this.setAutoLogout(remainingMilliseconds);
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({
+            isAuth: false,
+            authLoading: false,
+            error: err
+          });
         });
-      });
-  };
+      };
 
   signupHandler = (event, authData) => {
     event.preventDefault();
@@ -168,6 +169,7 @@ class App extends Component {
           header={
             <Toolbar>
               <MainNavigation
+                userName={ this.state.userName}
                 onOpenMobileNav={this.mobileNavHandler.bind(this, true)}
                 onLogout={this.logoutHandler}
                 isAuth={this.state.isAuth}
@@ -199,19 +201,33 @@ class App extends Component {
               loading={ this.state.authLoading } />
           }
           />
-        <Route element= { <Navigate to="/" />} />
+          <Route element={ <Navigate to="/" /> } />
           { this.state.isAuth &&
-            <Route path='/' exact element={
-              <FeedPage userId={ this.state.userId } token={ this.state.token } />
+            <Route exact path='/' element={
+            <h1>Welcome to home page</h1>
             }/>
           }
           { this.state.isAuth &&
-            <Route path='/:postId' element={
-            <SinglePostPage userId={ this.state.userId } token={ this.state.token } />
-            // <SinglePostPage {...props} userId={ this.state.userId } token={ this.state.token } />
+            <Route path='/user' element={
+            <FeedPage
+              userId={ this.state.userId } token={ this.state.token } />
+            }/>
+          }
+
+          { this.state.isAuth &&
+            <Route path='/event' element={
+            <h1>Event page coming soon</h1>
+            }/>
+          }
+     
+          { this.state.isAuth &&
+            <Route path='/user/:postId' element={
+            <SinglePostPage
+              userId={ this.state.userId } token={ this.state.token } />
             } />
           }
-          { this.state.isAuth && <Route element={<Navigate to="/"/>} />}
+          { this.state.isAuth && <Route element={ <Navigate to="/" /> } /> }
+
 
         </Routes>
       </Fragment>
